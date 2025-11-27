@@ -21,7 +21,7 @@ class _TodoListScreenState extends State<TodoListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Todo List'),
+        title: const Text('Link Note'),
         actions: [
           Consumer<TodoProvider>(
             builder: (context, todoProvider, child) {
@@ -80,6 +80,9 @@ class _TodoListScreenState extends State<TodoListScreen> {
               return Card(
                 key: ValueKey(todo.id),
                 margin: const EdgeInsets.symmetric(vertical: 4),
+                color: todo.colorValue != null && todo.colorValue != Colors.transparent.value
+                    ? Color(todo.colorValue!)
+                    : null,
                 child: Dismissible(
                   key: ValueKey('${todo.id}_dismissible'),
                   background: Container(

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:provider/provider.dart';
 import '../models/todo.dart';
 import '../providers/todo_provider.dart';
@@ -21,6 +20,23 @@ class _AddEditTodoScreenState extends State<AddEditTodoScreen> {
   late Color _color;
   late String? _memo;
   final _tagController = TextEditingController();
+
+  final List<Color> _colorPalette = [
+    Colors.transparent,
+    Colors.red[200]!,
+    Colors.blue[200]!,
+    Colors.green[200]!,
+    Colors.yellow[200]!,
+    Colors.orange[200]!,
+    Colors.purple[200]!,
+    Colors.brown[200]!,
+    Colors.grey[400]!,
+    Colors.pink[200]!,
+    Colors.teal[200]!,
+    Colors.indigo[200]!,
+    Colors.cyan[200]!,
+    Colors.lime[200]!,
+  ];
 
   @override
   void initState() {
@@ -67,115 +83,102 @@ class _AddEditTodoScreenState extends State<AddEditTodoScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
-          child: Column(
-            children: [
-              TextFormField(
-                initialValue: _name,
-                decoration: const InputDecoration(labelText: 'Name'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a name';
-                  }
-                  return null;
-                },
-                onSaved: (value) => _name = value!,
-              ),
-              TextFormField(
-                initialValue: _url,
-                decoration: const InputDecoration(labelText: 'URL'),
-                validator: (value) {
-                  if (value != null && value.isNotEmpty) {
-                    final urlPattern =
-                        r'^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$';
-                    if (!RegExp(urlPattern).hasMatch(value)) {
-                      return 'Please enter a valid URL';
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextFormField(
+                  initialValue: _name,
+                  decoration: const InputDecoration(labelText: 'Name'),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a name';
                     }
-                  }
-                  return null;
-                },
-                onSaved: (value) => _url = value,
-              ),
-              TextFormField(
-                controller: _tagController,
-                decoration:
-                    const InputDecoration(labelText: 'Tags (comma separated)'),
-                onSaved: (value) => _tags = value!,
-              ),
-              const SizedBox(height: 10),
-              Wrap(
-                spacing: 8.0,
-                children: allTags
-                    .map((tag) => ActionChip(
-                          label: Text(tag),
-                          onPressed: () {
-                            setState(() {
-                              final currentTags = _tagController.text
-                                  .split(',')
-                                  .map((t) => t.trim())
-                                  .where((t) => t.isNotEmpty)
-                                  .toList();
-                              if (!currentTags.contains(tag)) {
-                                currentTags.add(tag);
-                                _tagController.text = currentTags.join(', ');
-                              }
-                            });
-                          },
-                        ))
-                    .toList(),
-              ),
-              TextFormField(
-                initialValue: _memo,
-                decoration: const InputDecoration(labelText: 'Memo'),
-                maxLines: 5,
-                onSaved: (value) => _memo = value,
-              ),
-              const SizedBox(height: 20),
-              Row(
-                children: [
-                  const Text('Color:'),
-                  const SizedBox(width: 10),
-                  GestureDetector(
-                    onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: const Text('Pick a color'),
-                          content: SingleChildScrollView(
-                            child: ColorPicker(
-                              pickerColor: _color,
-                              onColorChanged: (color) {
-                                setState(() {
-                                  _color = color;
-                                });
-                              },
-                              showLabel: true,
-                              pickerAreaHeightPercent: 0.8,
+                    return null;
+                  },
+                  onSaved: (value) => _name = value!,
+                ),
+                TextFormField(
+                  initialValue: _url,
+                  decoration: const InputDecoration(labelText: 'URL'),
+                  validator: (value) {
+                    if (value != null && value.isNotEmpty) {
+                      final urlPattern =
+                          r'^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$';
+                      if (!RegExp(urlPattern).hasMatch(value)) {
+                        return 'Please enter a valid URL';
+                      }
+                    }
+                    return null;
+                  },
+                  onSaved: (value) => _url = value,
+                ),
+                TextFormField(
+                  controller: _tagController,
+                  decoration: const InputDecoration(
+                      labelText: 'Tags (comma separated)'),
+                  onSaved: (value) => _tags = value!,
+                ),
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 8.0,
+                  children: allTags
+                      .map((tag) => ActionChip(
+                            label: Text(tag),
+                            onPressed: () {
+                              setState(() {
+                                final currentTags = _tagController.text
+                                    .split(',')
+                                    .map((t) => t.trim())
+                                    .where((t) => t.isNotEmpty)
+                                    .toList();
+                                if (!currentTags.contains(tag)) {
+                                  currentTags.add(tag);
+                                  _tagController.text =
+                                      currentTags.join(', ');
+                                }
+                              });
+                            },
+                          ))
+                      .toList(),
+                ),
+                TextFormField(
+                  initialValue: _memo,
+                  decoration: const InputDecoration(labelText: 'Memo'),
+                  maxLines: 5,
+                  onSaved: (value) => _memo = value,
+                ),
+                const SizedBox(height: 20),
+                const Text('Color:'),
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 8.0,
+                  runSpacing: 8.0,
+                  children: _colorPalette
+                      .map((color) => GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _color = color;
+                              });
+                            },
+                            child: Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                color: color,
+                                shape: BoxShape.circle,
+                                border: Border.all(color: Colors.grey),
+                              ),
+                              child: _color.value == color.value
+                                  ? const Icon(Icons.check,
+                                      color: Colors.black)
+                                  : null,
                             ),
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: const Text('Done'),
-                            )
-                          ],
-                        ),
-                      );
-                    },
-                    child: Container(
-                      width: 30,
-                      height: 30,
-                      decoration: BoxDecoration(
-                        color: _color,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.grey),
-                      ),
-                    ),
-                  ),
-                ],
-              )
-            ],
+                          ))
+                      .toList(),
+                )
+              ],
+            ),
           ),
         ),
       ),

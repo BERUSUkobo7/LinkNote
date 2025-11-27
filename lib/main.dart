@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
       create: (context) => TodoProvider(),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'Todo App',
+        title: 'Link Note',
         theme: ThemeData(
           primarySwatch: Colors.blue,
           visualDensity: VisualDensity.adaptivePlatformDensity,
