@@ -7,11 +7,7 @@ class TagManagementScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Manage Tags'),
-      ),
-      body: Consumer<TodoProvider>(
+    return Consumer<TodoProvider>(
         builder: (context, todoProvider, child) {
           final allTags =
               todoProvider.todos.expand((todo) => todo.tags).toSet().toList();
@@ -58,7 +54,6 @@ class TagManagementScreen extends StatelessWidget {
             },
           );
         },
-      ),
-    );
+      );
   }
 }

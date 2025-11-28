@@ -1,68 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../models/todo.dart';
 import '../providers/todo_provider.dart';
 import 'add_edit_todo_screen.dart';
-import 'tag_management_screen.dart';
 
 class TodoListScreen extends StatefulWidget {
   const TodoListScreen({super.key});
 
   @override
-  _TodoListScreenState createState() => _TodoListScreenState();
+  TodoListScreenState createState() => TodoListScreenState();
 }
 
-class _TodoListScreenState extends State<TodoListScreen> {
-  String? _selectedTag;
+class TodoListScreenState extends State<TodoListScreen> {
   final Set<String> _expandedMemoIds = {};
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Link Note'),
-        actions: [
-          Consumer<TodoProvider>(
-            builder: (context, todoProvider, child) {
-              final allTags = todoProvider.todos
-                  .expand((todo) => todo.tags)
-                  .toSet()
-                  .toList();
-              if (allTags.isEmpty) {
-                return Container();
-              }
-              return PopupMenuButton<String>(
-                onSelected: (tag) {
-                  setState(() {
-                    _selectedTag = tag == 'all' ? null : tag;
-                  });
-                },
-                itemBuilder: (context) {
-                  return [
-                    const PopupMenuItem(
-                      value: 'all',
-                      child: Text('All'),
-                    ),
-                    ...allTags.map((tag) => PopupMenuItem(
-                          value: tag,
-                          child: Text(tag),
-                        )),
-                  ];
-                },
-                icon: const Icon(Icons.filter_list),
-              );
-            },
-          ),
-        ],
-      ),
-      body: Consumer<TodoProvider>(
+    return Consumer<TodoProvider>(
         builder: (context, todoProvider, child) {
-          final todos = _selectedTag == null
-              ? todoProvider.todos
-              : todoProvider.todos
-                  .where((todo) => todo.tags.contains(_selectedTag))
-                  .toList();
+          final todos = todoProvider.filteredTodos;
 
           return ReorderableListView.builder(
             buildDefaultDragHandles: false,
@@ -170,13 +126,14 @@ class _TodoListScreenState extends State<TodoListScreen> {
                           color: hasUrl ? null : Colors.grey,
                           onPressed: hasUrl
                               ? () async {
+                                  final scaffoldMessenger = ScaffoldMessenger.of(context);
                                   final url = todo.url!;
-                                  if (await canLaunch(url)) {
-                                    await launch(url);
+                                  if (await canLaunchUrl(Uri.parse(url))) {
+                                    await launchUrl(Uri.parse(url));
                                   } else {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text('Could not launch $url'),
+                                    scaffoldMessenger.showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Could not launch url'),
                                       ),
                                     );
                                   }
@@ -208,41 +165,6 @@ class _TodoListScreenState extends State<TodoListScreen> {
             },
           );
         },
-      ),
-      bottomNavigationBar: BottomAppBar(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            IconButton(
-              icon: const Text(
-                '#',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => const TagManagementScreen(),
-                  ),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => const AddEditTodoScreen(),
-            ),
-          );
-        },
-        child: const Icon(Icons.add),
-      ),
-      // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked, // Removed to move FAB to default bottom-right
-    );
+      );
   }
 }

@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/todo.dart';
@@ -7,11 +6,25 @@ import 'package:uuid/uuid.dart';
 class TodoProvider with ChangeNotifier {
   List<Todo> _todos = [];
   static const _todosKey = 'todos';
+  String? _selectedTag;
 
   List<Todo> get todos => _todos;
+  String? get selectedTag => _selectedTag;
+
+  List<Todo> get filteredTodos {
+    if (_selectedTag == null) {
+      return _todos;
+    }
+    return _todos.where((todo) => todo.tags.contains(_selectedTag)).toList();
+  }
 
   TodoProvider() {
     loadTodos();
+  }
+
+  void setSelectedTag(String? tag) {
+    _selectedTag = tag;
+    notifyListeners();
   }
 
   Future<void> _saveTodos() async {
@@ -31,7 +44,7 @@ class TodoProvider with ChangeNotifier {
 
   void addTodo(String name, String? url, String tags, int? colorValue, String? memo) {
     final newTodo = Todo(
-      id: Uuid().v4(),
+      id: const Uuid().v4(),
       name: name,
       url: url,
       tags: tags.split(',').map((tag) => tag.trim()).where((tag) => tag.isNotEmpty).toList(),

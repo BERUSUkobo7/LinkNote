@@ -9,10 +9,10 @@ class AddEditTodoScreen extends StatefulWidget {
   const AddEditTodoScreen({super.key, this.todo});
 
   @override
-  _AddEditTodoScreenState createState() => _AddEditTodoScreenState();
+  AddEditTodoScreenState createState() => AddEditTodoScreenState();
 }
 
-class _AddEditTodoScreenState extends State<AddEditTodoScreen> {
+class AddEditTodoScreenState extends State<AddEditTodoScreen> {
   final _formKey = GlobalKey<FormState>();
   late String _name;
   late String? _url;
@@ -103,7 +103,7 @@ class _AddEditTodoScreenState extends State<AddEditTodoScreen> {
                   decoration: const InputDecoration(labelText: 'URL'),
                   validator: (value) {
                     if (value != null && value.isNotEmpty) {
-                      final urlPattern =
+                      const urlPattern =
                           r'^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$';
                       if (!RegExp(urlPattern).hasMatch(value)) {
                         return 'Please enter a valid URL';
